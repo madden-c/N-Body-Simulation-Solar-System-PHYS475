@@ -71,5 +71,25 @@ initial_bodies = [
     CelestialBody("Neptune", color.blue, vector(4.381e12, -8.28e11, -8.704e10),
                  2.4622e7, 1.0241e26, vector(966.8, 5495.1, -131.6))
 ]
+```
+Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i$3\neq4$j).
+```python
+def calculate_forces(bodies):
+    """Calculate gravitational forces between all bodies"""
+    for i in bodies:
+        i.F = vector(0, 0, 0)  # Reset force vector
+        
+        # Calculate force from all other bodies
+        for j in bodies:
+            if i != j:  # Skip self-interaction
+                r = i.pos - j.pos  # Distance vector
+                if mag(r) > i.radius + j.radius:  # Only if not colliding
+                    # Newton's law of gravitation:
+                    F = -G * i.mass * j.mass * r.hat / mag(r)**2
+                    i.F += F  # Accumulate forces
+```
+
+
+
 
 ```
