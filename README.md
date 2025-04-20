@@ -19,7 +19,9 @@ radius_scale_factor = 1e3      # Scaling factor for visualization
 dt = 1e4                       # Time step (seconds)
 total_simulation_time = dt * 1e4  # Total simulation duration 
 bodies_to_compare = ['sun', 'mercury', 'venus', 'earth', 'mars']  # Bodies to simulate
-
+```
+Now we create the CelestialBody class. This is a fundamental component of the code that allows us to store the physical properties of the planets we are looking to simulate.
+```python
 class CelestialBody:
     """Class to represent celestial bodies with physical properties"""
     def __init__(self, name, color, pos, radius, mass, v):
@@ -31,4 +33,4 @@ class CelestialBody:
         self.v = v             # Velocity vector (vx,vy,vz) in m/s
         self.F = vector(0, 0, 0)  # Force vector (initially zero)
         self.p = self.v * self.mass  # Momentum vector (p = mv)
-'''
+```
