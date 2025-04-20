@@ -72,7 +72,7 @@ initial_bodies = [
                  2.4622e7, 1.0241e26, vector(966.8, 5495.1, -131.6))
 ]
 ```
-Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i$3\neq4$j).
+Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i≠j). We then compute the distance vector from j to i and perfrom a collision check. Finally, we perform the force calculation and accumulate force, adding the computed force to i.F (total force on body i).
 ```python
 def calculate_forces(bodies):
     """Calculate gravitational forces between all bodies"""
