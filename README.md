@@ -20,7 +20,7 @@ dt = 1e4                       # Time step (seconds)
 total_simulation_time = dt * 1e4  # Total simulation duration 
 bodies_to_compare = ['sun', 'mercury', 'venus', 'earth', 'mars']  # Bodies to simulate
 ```
-Now we create the CelestialBody class. This is a fundamental component of the code that allows us to store the physical properties of the planets needed for the simulation. Once we establish the CelestialBody class, we have defined the structure of each body we look to simulate, now we provide the initial data for each object that will be used to perform the N-Body simulation. We define what visualization characteristics each body will have, and then use VPython vectors to hold initial position and velocity of each planetary body. Our data values for initial position and velocity are pulled from AstroPy JPL Ephemeris via the get_body_barycentric_posvel prompt. The position and velocity that are retrieved are in cartesian representation and are in AU and AU/day respectively. The position and velocity vectors which are hardcoded here were converted to the units of m and m/s respectively.
+Now we create the CelestialBody class. This is a fundamental component of the code that allows us to store the physical properties of the planets needed for the simulation. Once we establish the CelestialBody class, we have defined the structure of each body we look to simulate, now we provide the initial data for each object that will be used to perform the N-Body simulation. We define what visualization characteristics each body will have, and then use VPython vectors to hold initial position and velocity of each planetary body. Our data values for initial position and velocity are pulled from AstroPy JPL Ephemeris via the get_body_barycentric_posvel prompt. The position and velocity that are retrieved are in cartesian representation and are in AU and AU/day respectively. 
 ```python
 class CelestialBody:
     """Class to represent celestial bodies with physical properties"""
@@ -72,7 +72,7 @@ initial_bodies = [
                  2.4622e7, 1.0241e26, vector(966.8, 5495.1, -131.6))
 ]
 ```
-Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i≠j). We then compute the distance vector from j to i and perfrom a collision check. Finally, we perform the force calculation and accumulate force, adding the computed force to i.F (total force on body i).
+Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i≠j). We then compute the distance vector from j to i and perfrom a collision check. Finally, we perform the force calculation and accumulate force, adding the computed force to i.F (total force on body i). The position and velocity vectors which are hardcoded here were converted to the units of m and m/s respectively. The computed forces (i.f) will be used in the time integration step (Euler/RK4) to update positions and velocites of our simulated bodies.
 ```python
 def calculate_forces(bodies):
     """Calculate gravitational forces between all bodies"""
@@ -88,8 +88,65 @@ def calculate_forces(bodies):
                     F = -G * i.mass * j.mass * r.hat / mag(r)**2
                     i.F += F  # Accumulate forces
 ```
-
-
-
-
+The Euler Method is a first-order numerical integration technique that is one of two methods we will be using to approximate the motion of celestial bodies by iteratively updating their positions and velocities.
+```python
+def run_euler_simulation():
+    """Run simulation using Euler integration method"""
+    # Set up visualization
+    scene_euler = canvas(title="Euler's Method Simulation", width=1000, height=600, range=5e12)
+    
+    # Initialize bodies with visual elements
+    bodies_euler = []
+    for body in initial_bodies:
+        # Create visual sphere with properties
+        s = sphere(pos=body.pos, color=body.color, make_trail=True, 
+                  trail_type="curve", trail_color=body.color,
+                  radius=body.radius)
+        # Copy physical properties
+        s.mass = body.mass
+        s.v = body.v
+        s.F = vector(0,0,0)
+        s.p = s.v * s.mass
+        s.label = label(pos=s.pos, text=f'{body.name}', height=10, border=4)
+        bodies_euler.append(s)
+    
+    # Initialize data collection
+    data_euler = {'time': []}
+    for body in bodies_euler:
+        prefix = body.label.text.lower()
+        data_euler[f'{prefix}_x'] = []
+        data_euler[f'{prefix}_y'] = []
+        data_euler[f'{prefix}_z'] = []
+    
+    # Simulation loop
+    current_time = 0
+    while current_time <= total_simulation_time and len(bodies_euler) > 1:
+        rate(100)  # Control visualization speed
+        
+        # Record current state
+        data_euler['time'].append(current_time)
+        for body in bodies_euler:
+            prefix = body.label.text.lower()
+            data_euler[f'{prefix}_x'].append(body.pos.x)
+            data_euler[f'{prefix}_y'].append(body.pos.y)
+            data_euler[f'{prefix}_z'].append(body.pos.z)
+        
+        # Euler integration steps:
+        # 1. Calculate forces
+        calculate_forces(bodies_euler)
+        
+        # 2. Update momentum (p = p + F*dt)
+        for body in bodies_euler:
+            body.p += body.F * dt
+        
+        # 3. Update velocity (v = p/m)
+        # 4. Update position (x = x + v*dt)
+        for body in bodies_euler:
+            body.v = body.p / body.mass
+            body.pos += body.v * dt
+            body.label.pos = body.pos  # Update label position
+        
+        current_time += dt
+    
+    return pd.DataFrame(data_euler)
 ```
