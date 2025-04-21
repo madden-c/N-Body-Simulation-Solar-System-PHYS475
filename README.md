@@ -88,7 +88,7 @@ def calculate_forces(bodies):
                     F = -G * i.mass * j.mass * r.hat / mag(r)**2
                     i.F += F  # Accumulate forces
 ```
-The Euler Method is a first-order numerical integration technique that is one of two methods we will be using to approximate the motion of celestial bodies by iteratively updating their positions and velocities.
+The Euler Method is a first-order numerical integration technique that is one of two methods we will be using to approximate the motion of celestial bodies by iteratively updating their positions and velocities. Before we perform calculations, we first create a 3D canvas using VPython to act as the region in which the planetary bodies are displayed during the simulation. We also create a dictionary (data_euler) to store time and position for our later data analysis. Now, calculate_forces(bodies_euler) computes gravitational forces between all bodies. During body.p we calculate momentum using Newton's 2nd Law (Euler step 1), body.v handles velocity calculation using body.p (Euler step 2), and body.pos updates position using velocity (Euler step 3). Euler's method is best used for short simulations, as errors accumulate as O(Δt^2) per time step. We also have to use a smaller dt (on the order of hours) for our orbits to remain realisticly stable.
 ```python
 def run_euler_simulation():
     """Run simulation using Euler integration method"""
