@@ -264,7 +264,7 @@ def get_astropy_data(sim_times):
     
     return pd.DataFrame(astropy_data)
 ```
-
+In this portion of our code, we quantatively compare the simulation results of Euler and RK4 integration methods against the ephemeris data we just extracted, and we visualize the differences by plotting them. We create four plots for each body: Position vs Time, Position Error, Trajectory (X-Y Planne), and Error Magnitude. Quantitative error metrics are calculated in euler_error_mag and rk4_error_mag.
 ```python
 def compare_methods(euler_df, rk4_df, astropy_df):
     """Compare simulation results and generate plots"""
