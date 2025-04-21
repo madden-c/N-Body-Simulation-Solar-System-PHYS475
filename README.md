@@ -241,12 +241,12 @@ def run_rk4_simulation():
     
     return pd.DataFrame(data_rk4)
 ```
-
+Now that we have completed our simulation over a designated interval of time, we move on to retrieving reference position data from JPL's DE440 Ephemerides database (the most accurate planetary position data available) to measure our simulation data against. We create a dictionary to store the name of the body, time since simulation start, and barycentric coordinates with astropy_data. Next, we activate JPL's DE440 Ephemeris with solar_system_ephemeris.set() and we convert simulation time (seconds since 2023-01-01) to an AstroPy time object that handles UTC to TBD (Barycentric Dynamical Time) conversion. We then query the position of the specified body using get_body_barycentric, this retrieves the body's coordinates in the Internation Celestial Reference System (ICRS) which uses the solar system's barycenter as the origin. Finally, we convert from AU to meters, ensuring to remain consistent in our use of SI values.
 ```python
 def get_astropy_data(sim_times):
     """Get reference positions from JPL ephemeris"""
     astropy_data = {'time': [], 'body': [], 'x': [], 'y': [], 'z': []}
-    start_time = datetime(2023, 1, 1)  # Arbitrary reference date
+    start_time = datetime(2023, 1, 1)  # Reference date
     
     with solar_system_ephemeris.set('jpl'):  # Use high-precision JPL ephemeris
         for t_sec in sim_times:
