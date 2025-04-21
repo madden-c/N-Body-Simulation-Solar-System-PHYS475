@@ -241,3 +241,143 @@ def run_rk4_simulation():
     
     return pd.DataFrame(data_rk4)
 ```
+
+```python
+def get_astropy_data(sim_times):
+    """Get reference positions from JPL ephemeris"""
+    astropy_data = {'time': [], 'body': [], 'x': [], 'y': [], 'z': []}
+    start_time = datetime(2023, 1, 1)  # Arbitrary reference date
+    
+    with solar_system_ephemeris.set('jpl'):  # Use high-precision JPL ephemeris
+        for t_sec in sim_times:
+            # Convert simulation time to astronomical time
+            t = Time(start_time + timedelta(seconds=t_sec))
+            
+            # Get positions for each body
+            for body in bodies_to_compare:
+                pos = get_body_barycentric(body, t)  # Get barycentric position
+                astropy_data['time'].append(t_sec)
+                astropy_data['body'].append(body)
+                astropy_data['x'].append(pos.x.to(u.m).value)  # Convert to meters
+                astropy_data['y'].append(pos.y.to(u.m).value)
+                astropy_data['z'].append(pos.z.to(u.m).value)
+    
+    return pd.DataFrame(astropy_data)
+```
+
+```python
+def compare_methods(euler_df, rk4_df, astropy_df):
+    """Compare simulation results and generate plots"""
+    results = {}
+    
+    for body in bodies_to_compare:
+        # Skip the sun for plotting (its position is fixed at origin)
+        if body == 'sun':
+            continue
+            
+        # Prepare data from each method
+        euler_data = euler_df[['time', f'{body}_x', f'{body}_y', f'{body}_z']].copy()
+        euler_data.columns = ['time', 'x', 'y', 'z']
+        euler_data['method'] = 'Euler'
+        
+        rk4_data = rk4_df[['time', f'{body}_x', f'{body}_y', f'{body}_z']].copy()
+        rk4_data.columns = ['time', 'x', 'y', 'z']
+        rk4_data['method'] = 'RK4'
+        
+        astro_data = astropy_df[astropy_df['body'] == body][['time', 'x', 'y', 'z']].copy()
+        astro_data['method'] = 'Astropy'
+        
+        # Combine all data for this body
+        combined = pd.concat([euler_data, rk4_data, astro_data])
+        results[body] = combined
+        
+        # Create comparison plots
+        plt.figure(figsize=(15, 10))
+        
+        # Plot 1: X Position vs Time
+        plt.subplot(2, 2, 1)
+        for method, df in combined.groupby('method'):
+            plt.plot(df['time'], df['x'], label=method)
+        plt.title(f'{body.capitalize()} X Position')
+        plt.ylabel('Position (m)')
+        plt.legend()
+        
+        # Plot 2: X Position Error vs Time
+        plt.subplot(2, 2, 2)
+        euler_err = euler_data.copy()
+        euler_err['x'] -= astro_data['x'].values
+        rk4_err = rk4_data.copy()
+        rk4_err['x'] -= astro_data['x'].values
+        plt.plot(euler_err['time'], euler_err['x'], label='Euler Error')
+        plt.plot(rk4_err['time'], rk4_err['x'], label='RK4 Error')
+        plt.title('X Position Error')
+        plt.ylabel('Error (m)')
+        plt.legend()
+        
+        # Plot 3: X-Y Trajectory
+        plt.subplot(2, 2, 3)
+        for method, df in combined.groupby('method'):
+            plt.plot(df['x'], df['y'], label=method)
+        plt.title('X-Y Trajectory')
+        plt.xlabel('X (m)')
+        plt.ylabel('Y (m)')
+        plt.legend()
+        
+        # Plot 4: Error Magnitude vs Time
+        plt.subplot(2, 2, 4)
+        euler_err['error_mag'] = np.sqrt(euler_err['x']**2 + euler_err['y']**2 + euler_err['z']**2)
+        rk4_err['error_mag'] = np.sqrt(rk4_err['x']**2 + rk4_err['y']**2 + rk4_err['z']**2)
+        plt.plot(euler_err['time'], euler_err['error_mag'], label='Euler')
+        plt.plot(rk4_err['time'], rk4_err['error_mag'], label='RK4')
+        plt.title('Position Error Magnitude')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Error (m)')
+        plt.legend()
+        
+        plt.suptitle(f'{body.capitalize()} Simulation Comparison')
+        plt.tight_layout()
+        plt.show()
+    
+    return results
+```
+
+```python
+if __name__ == "__main__":
+    print("Running Euler simulation...")
+    euler_results = run_euler_simulation()
+
+    print("\nRunning RK4 simulation...")
+    rk4_results = run_rk4_simulation()
+
+    print("\nGetting Astropy reference data...")
+    astropy_data = get_astropy_data(euler_results['time'].unique())
+
+    print("\nComparing methods...")
+    comparison_results = compare_methods(euler_results, rk4_results, astropy_data)
+
+    # Calculate and display error statistics
+    print("\nError Statistics:")
+    for body in bodies_to_compare:
+        if body == 'sun':  # Skip sun as it's fixed
+            continue
+            
+        # Calculate error magnitudes
+        euler_err = comparison_results[body][comparison_results[body]['method'] == 'Euler']
+        rk4_err = comparison_results[body][comparison_results[body]['method'] == 'RK4']
+        
+        # Euclidean distance between simulation and Astropy
+        euler_error_mag = np.sqrt(
+            (euler_err['x'] - astropy_data[astropy_data['body'] == body]['x'].values)**2 +
+            (euler_err['y'] - astropy_data[astropy_data['body'] == body]['y'].values)**2 +
+            (euler_err['z'] - astropy_data[astropy_data['body'] == body]['z'].values)**2)
+        
+        rk4_error_mag = np.sqrt(
+            (rk4_err['x'] - astropy_data[astropy_data['body'] == body]['x'].values)**2 +
+            (rk4_err['y'] - astropy_data[astropy_data['body'] == body]['y'].values)**2 +
+            (rk4_err['z'] - astropy_data[astropy_data['body'] == body]['z'].values)**2)
+        
+        # Print statistics
+        print(f"\n{body.capitalize()}:")
+        print(f"Euler - Mean Error: {euler_error_mag.mean():.2e} m, Max Error: {euler_error_mag.max():.2e} m")
+        print(f"RK4   - Mean Error: {rk4_error_mag.mean():.2e} m, Max Error: {rk4_error_mag.max():.2e} m")
+```
