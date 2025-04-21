@@ -150,3 +150,94 @@ def run_euler_simulation():
     
     return pd.DataFrame(data_euler)
 ```
+The Runge-Kutta 4th Order (RK4) method is a high precision numerical integration technique used often in solving differential equations governing celestial motion. RK4 improves upon Euler's method by evaluating four intermediate slopes per time step, thus significantly reducing error accumulation over time. The four slopes are K1: Slope at curremt state, K2: Slope at midpoint using K1, K3: Improved midpoint slope using K2, and K4: Slope at end using K3. Firstly, we have the derivatives() function where we compute the time derivatives of positions and velocities that outputs velocities and accelerations respectively. We store the initial positions/velocites to reset after intermediate calculations, then we compute our weights K1, K2, K3, and K4. Then we calculate the position and velocity utilizing the weighted average of our previous four slope values. The RK4 method has 4th-order accuracy, which helps us to minimize error propogation in our simulation over time. The RK4 method is also able to use larger values for dt (on the order of days) and remain stable. Overall, the RK4 method supercedes the Euler method in almost every way, allowing for larger time steps while maintaing stability and accuracy.
+```python
+def derivatives(bodies):
+    """Calculate derivatives for RK4 method (dx/dt = v, dv/dt = F/m)"""
+    calculate_forces(bodies)  # Update all forces first
+    derivs = []
+    for body in bodies:
+        derivs.append({
+            'v': body.F/body.mass,  # dv/dt = acceleration
+            'x': body.v             # dx/dt = velocity
+        })
+    return derivs
+
+def run_rk4_simulation():
+    """Run simulation using RK4 integration method"""
+    scene_rk4 = canvas(title="RK4 Method Simulation", width=1000, height=600, range=5e12)
+    
+    # Initialize bodies with 
+    bodies_rk4 = []
+    for body in initial_bodies:
+        s = sphere(pos=body.pos, color=body.color, make_trail=True,
+                  trail_type="curve", trail_color=body.color,
+                  radius=body.radius)
+        s.mass = body.mass
+        s.v = body.v
+        s.F = vector(0,0,0)
+        s.p = s.v * s.mass
+        s.label = label(pos=s.pos, text=f'{body.name}', height=10, border=4)
+        bodies_rk4.append(s)
+    
+    # Initialize data collection
+    data_rk4 = {'time': []}
+    for body in bodies_rk4:
+        prefix = body.label.text.lower()
+        data_rk4[f'{prefix}_x'] = []
+        data_rk4[f'{prefix}_y'] = []
+        data_rk4[f'{prefix}_z'] = []
+    
+    current_time = 0
+    while current_time <= total_simulation_time and len(bodies_rk4) > 1:
+        rate(100)
+        
+        # Record current state
+        data_rk4['time'].append(current_time)
+        for body in bodies_rk4:
+            prefix = body.label.text.lower()
+            data_rk4[f'{prefix}_x'].append(body.pos.x)
+            data_rk4[f'{prefix}_y'].append(body.pos.y)
+            data_rk4[f'{prefix}_z'].append(body.pos.z)
+        
+        # RK4 integration steps:
+        # 1. Save original state
+        original_state = [{
+            'pos': vector(body.pos.x, body.pos.y, body.pos.z), 
+            'v': vector(body.v.x, body.v.y, body.v.z)
+        } for body in bodies_rk4]
+        
+        # 2. Calculate k1 coefficients
+        k1 = derivatives(bodies_rk4)
+        for i, body in enumerate(bodies_rk4):
+            body.pos = original_state[i]['pos'] + 0.5*dt*k1[i]['x']
+            body.v = original_state[i]['v'] + 0.5*dt*k1[i]['v']
+        
+        # 3. Calculate k2 coefficients
+        k2 = derivatives(bodies_rk4)
+        for i, body in enumerate(bodies_rk4):
+            body.pos = original_state[i]['pos'] + 0.5*dt*k2[i]['x']
+            body.v = original_state[i]['v'] + 0.5*dt*k2[i]['v']
+        
+        # 4. Calculate k3 coefficients
+        k3 = derivatives(bodies_rk4)
+        for i, body in enumerate(bodies_rk4):
+            body.pos = original_state[i]['pos'] + dt*k3[i]['x']
+            body.v = original_state[i]['v'] + dt*k3[i]['v']
+        
+        # 5. Calculate k4 coefficients
+        k4 = derivatives(bodies_rk4)
+        
+        # 6. Final update using weighted average
+        for i, body in enumerate(bodies_rk4):
+            body.pos = original_state[i]['pos'] + (dt/6)*(
+                k1[i]['x'] + 2*k2[i]['x'] + 2*k3[i]['x'] + k4[i]['x'])
+            body.v = original_state[i]['v'] + (dt/6)*(
+                k1[i]['v'] + 2*k2[i]['v'] + 2*k3[i]['v'] + k4[i]['v'])
+            body.p = body.v * body.mass
+            body.label.pos = body.pos
+        
+        current_time += dt
+    
+    return pd.DataFrame(data_rk4)
+```
