@@ -340,7 +340,7 @@ def compare_methods(euler_df, rk4_df, astropy_df):
     
     return results
 ```
-
+The if __name__ == "__main__": block below is the orchestrator of the entire simulation, coordinating the sequence of operations from running the simulation to analyzing their results. This block executes in order of first running the Euler method simulation, then RK4, fetching AstroPy data, comparing Euler and RK4 via plotting, and then finally performing basic error analysis. Having our code structured this way allows for sequential execution, time alignment between AstroPy and simulations, and easier debugging as each function operates independently. With the modularity we built into our code, it would be a more approachable task to add further integration methods to compare or to add more bodies to simulate.
 ```python
 if __name__ == "__main__":
     print("Running Euler simulation...")
