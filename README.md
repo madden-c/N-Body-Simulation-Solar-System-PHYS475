@@ -36,43 +36,42 @@ class CelestialBody:
 
 initial_bodies = [
     # Sun (central body)
-    CelestialBody("Sun", color.yellow, vector(0, 0, 0), 
-                 6.96342e8, 1.9884e30, vector(0, 0, 0)),
+    CelestialBody("Sun", color.yellow, vector(0,0,0), 
+                 6.96342e8, 1.9884e30, vector(0,0,0)),
     
     # Mercury
-    CelestialBody("Mercury", color.white, vector(-3.7693e10, -5.3896e10, -4.7389e9), 
-                 2.4397e6, 3.3011e23, vector(37658.5, -26019.6, -4793.4)),
+    CelestialBody("Mercury", color.white, vector(-5.89406e10, -1.453e10, -6.1304e9), 
+                 2.4397e6, 3.3011e23, vector(6591.68, -44823.7, -2404.34)),
     
     # Venus
-    CelestialBody("Venus", color.orange, vector(1.0765e11, -2.6274e10, -6.7013e9), 
-                 6.051e6, 4.8675e24, vector(8479.3, 34785.2, -446.6)),
+    CelestialBody("Venus", color.orange, vector(9.33511e10, 5.48211e10, 4.42522e9), 
+                 6.051e6, 4.5675e24, vector(-16959.9, 30567.2, 882.861)),
     
     # Earth
-    CelestialBody("Earth", color.blue, vector(-2.7196e10, 1.4489e11, 1.3065e7), 
-                 6.371e6, 5.9724e24, vector(-29783.2, -5595.3, 1.2216)),
+    CelestialBody("Earth", color.blue, vector(-1.38235e11, 6.09568e10, 0), 
+                 6.378e6, 5.9735e24, vector(-12262.7, -26812.9, 0)),
     
     # Mars
-    CelestialBody("Mars", color.red, vector(-1.9826e11, -8.0597e10, 3.4187e9), 
-                 3.3895e6, 6.4171e23, vector(8681.9, -23876.6, -651.4)),
+    CelestialBody("Mars", color.red, vector(2.0567e11, -2.61614e10, 3.64974e9), 
+                 1.794e6, 6.4171e24, vector(3621.45, 26168.2, 452.759)),
     
     # Jupiter
-    CelestialBody("Jupiter", color.orange, vector(5.4386e11, -5.1516e11, -1.2633e10),
-                 6.9911e7, 1.8982e27, vector(8206.9, 9423.7, -228.3)),
+    CelestialBody("Jupiter", color.orange, vector(5.876e11, -3.885e11, -1.541e10),
+                 6.9911e7, 1.89813e27, vector(6831.3, 10210.0, -191.5)),
     
     # Saturn
-    CelestialBody("Saturn", color.yellow, vector(9.1839e11, -1.0757e12, -2.2909e10),
+    CelestialBody("Saturn", color.yellow, vector(9.048e11, -1.075e12, -2.292e10),
                  5.8232e7, 5.6834e26, vector(6475.1, 5389.5, -397.3)),
     
     # Uranus
-    CelestialBody("Uranus", color.cyan, vector(2.1910e12, 1.9640e12, -2.4990e10),
+    CelestialBody("Uranus", color.cyan, vector(2.191e12, 1.964e12, -2.499e10),
                  2.5362e7, 8.6813e25, vector(-4574.3, 4991.7, 71.3)),
     
     # Neptune
-    CelestialBody("Neptune", color.blue, vector(4.3810e12, -8.2800e11, -8.7040e10),
+    CelestialBody("Neptune", color.blue, vector(4.381e12, -8.28e11, -8.704e10),
                  2.4622e7, 1.0241e26, vector(966.8, 5495.1, -131.6))
-]
 ```
-Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i≠j). We then compute the distance vector from j to i and perfrom a collision check. Finally, we perform the force calculation and accumulate force, adding the computed force to i.F (total force on body i). The position and velocity vectors which are hardcoded here were converted to the units of m and m/s respectively. The computed forces (i.f) will be used in the time integration step (Euler/RK4) to update positions and velocites of our simulated bodies.
+Here is were our numerical calculations begin. We start with the calculate_forces() function which is responsible for computing the gravitational forces between all celestial bodies each time step using Newton's Law of Universal Gravitation. Firstly, each body's force(i.F) is reset to (0, 0, 0) at the beginning of each time step. Next, we have a nested loop over bodies, where for each body i, the interactions with every other body j is computed (where i≠j). We then compute the distance vector from j to i and perfrom a collision check. Finally, we perform the force calculation and accumulate force, adding the computed force to i.F (total force on body i).  The computed forces (i.f) will be used in the time integration step (Euler/RK4) to update positions and velocites of our simulated bodies.
 ```python
 def calculate_forces(bodies):
     """Calculate gravitational forces between all bodies"""
@@ -241,7 +240,7 @@ def run_rk4_simulation():
     
     return pd.DataFrame(data_rk4)
 ```
-Now that we have completed our simulation over a designated interval of time, we move on to retrieving reference position data from JPL's DE440 Ephemerides database (the most accurate planetary position data available) to measure our simulation data against. We create a dictionary to store the name of the body, time since simulation start, and barycentric coordinates with astropy_data. Next, we activate JPL's DE440 Ephemeris with solar_system_ephemeris.set() and we convert simulation time (seconds since 2023-01-01) to an AstroPy time object that handles UTC to TBD (Barycentric Dynamical Time) conversion. We then query the position of the specified body using get_body_barycentric, this retrieves the body's coordinates in the Internation Celestial Reference System (ICRS) which uses the solar system's barycenter as the origin. Finally, we convert from AU to meters, ensuring to remain consistent in our use of SI values.
+Now that we have completed our simulation over a designated interval of time, we move on to retrieving reference position data from JPL's DE440 Ephemerides database (the most accurate planetary position data available) to measure our simulation data against. We create a dictionary to store the name of the body, time since simulation start, and barycentric coordinates with astropy_data. Next, we activate JPL's DE440 Ephemeris with solar_system_ephemeris.set() and we convert simulation time (seconds since 2023-01-01) to an AstroPy time object that handles UTC to TBD (Barycentric Dynamical Time) conversion. We then query the position of the specified body using get_body_barycentric, this retrieves the body's coordinates in the Internation Celestial Reference System (ICRS) which uses the solar system's barycenter as the origin (this will introduce some error in our comparison graphs as our simulation is heliocentric). Finally, we convert from AU to meters, ensuring to remain consistent in our use of SI values.
 ```python
 def get_astropy_data(sim_times):
     """Get reference positions from JPL ephemeris"""
@@ -264,7 +263,7 @@ def get_astropy_data(sim_times):
     
     return pd.DataFrame(astropy_data)
 ```
-In this portion of our code, we quantatively compare the simulation results of Euler and RK4 integration methods against the ephemeris data we just extracted, and we visualize the differences by plotting them. We create four plots for each body: Position vs Time, Position Error, Trajectory (X-Y Planne), and Error Magnitude. Quantitative error metrics are calculated in euler_error_mag and rk4_error_mag.
+In this portion of our code, we quantatively compare the simulation results of Euler and RK4 integration methods against the ephemeris data we just extracted, and we visualize the differences by plotting them. We create four plots for each body: Position vs Time, Position Error, Trajectory (X-Y Planne), and Error Magnitude. Quantitative error metrics are calculated in euler_error_mag and rk4_error_mag and displayed as text output later.
 ```python
 def compare_methods(euler_df, rk4_df, astropy_df):
     """Compare simulation results and generate plots"""
@@ -340,7 +339,7 @@ def compare_methods(euler_df, rk4_df, astropy_df):
     
     return results
 ```
-The if __name__ == "__main__": block below is the orchestrator of the entire simulation, coordinating the sequence of operations from running the simulation to analyzing their results. This block executes in order of first running the Euler method simulation, then RK4, fetching AstroPy data, comparing Euler and RK4 via plotting, and then finally performing basic error analysis. Having our code structured this way allows for sequential execution, time alignment between AstroPy and simulations, and easier debugging as each function operates independently. With the modularity we built into our code, it would be a more approachable task to add further integration methods to compare or to add more bodies to simulate.
+The if __name__ == "__main__": block below is the orchestrator of the entire simulation, coordinating the sequence of operations from running the simulation to analyzing their results. This block executes in order of first running the Euler method simulation, then RK4, fetching AstroPy data, comparing Euler and RK4 via plotting, and then finally performing basic error analysis. Having our code structured this way allows for sequential execution, time alignment between AstroPy and simulations, and easier debugging as each function operates independently. With the modularity we built into our code, it would be a more approachable task to add further integration methods to compare to or add more bodies to simulate.
 ```python
 if __name__ == "__main__":
     print("Running Euler simulation...")
