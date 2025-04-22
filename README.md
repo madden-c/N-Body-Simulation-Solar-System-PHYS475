@@ -36,39 +36,39 @@ class CelestialBody:
 
 initial_bodies = [
     # Sun (central body)
-    CelestialBody("Sun", color.yellow, vector(0,0,0), 
-                 6.96342e8, 1.9884e30, vector(0,0,0)),
+    CelestialBody("Sun", color.yellow, vector(0, 0, 0), 
+                 6.96342e8, 1.9884e30, vector(0, 0, 0)),
     
     # Mercury
-    CelestialBody("Mercury", color.white, vector(-5.89406e10, -1.453e10, -6.1304e9), 
-                 2.4397e6, 3.3011e23, vector(6591.68, -44823.7, -2404.34)),
+    CelestialBody("Mercury", color.white, vector(-3.7693e10, -5.3896e10, -4.7389e9), 
+                 2.4397e6, 3.3011e23, vector(37658.5, -26019.6, -4793.4)),
     
     # Venus
-    CelestialBody("Venus", color.orange, vector(9.33511e10, 5.48211e10, 4.42522e9), 
-                 6.051e6, 4.5675e24, vector(-16959.9, 30567.2, 882.861)),
+    CelestialBody("Venus", color.orange, vector(1.0765e11, -2.6274e10, -6.7013e9), 
+                 6.051e6, 4.8675e24, vector(8479.3, 34785.2, -446.6)),
     
     # Earth
-    CelestialBody("Earth", color.blue, vector(-1.38235e11, 6.09568e10, 0), 
-                 6.378e6, 5.9735e24, vector(-12262.7, -26812.9, 0)),
+    CelestialBody("Earth", color.blue, vector(-2.7196e10, 1.4489e11, 1.3065e7), 
+                 6.371e6, 5.9724e24, vector(-29783.2, -5595.3, 1.2216)),
     
     # Mars
-    CelestialBody("Mars", color.red, vector(2.0567e11, -2.61614e10, 3.64974e9), 
-                 1.794e6, 6.4171e24, vector(3621.45, 26168.2, 452.759)),
+    CelestialBody("Mars", color.red, vector(-1.9826e11, -8.0597e10, 3.4187e9), 
+                 3.3895e6, 6.4171e23, vector(8681.9, -23876.6, -651.4)),
     
     # Jupiter
-    CelestialBody("Jupiter", color.orange, vector(5.876e11, -3.885e11, -1.541e10),
-                 6.9911e7, 1.89813e27, vector(6831.3, 10210.0, -191.5)),
+    CelestialBody("Jupiter", color.orange, vector(5.4386e11, -5.1516e11, -1.2633e10),
+                 6.9911e7, 1.8982e27, vector(8206.9, 9423.7, -228.3)),
     
     # Saturn
-    CelestialBody("Saturn", color.yellow, vector(9.048e11, -1.075e12, -2.292e10),
+    CelestialBody("Saturn", color.yellow, vector(9.1839e11, -1.0757e12, -2.2909e10),
                  5.8232e7, 5.6834e26, vector(6475.1, 5389.5, -397.3)),
     
     # Uranus
-    CelestialBody("Uranus", color.cyan, vector(2.191e12, 1.964e12, -2.499e10),
+    CelestialBody("Uranus", color.cyan, vector(2.1910e12, 1.9640e12, -2.4990e10),
                  2.5362e7, 8.6813e25, vector(-4574.3, 4991.7, 71.3)),
     
     # Neptune
-    CelestialBody("Neptune", color.blue, vector(4.381e12, -8.28e11, -8.704e10),
+    CelestialBody("Neptune", color.blue, vector(4.3810e12, -8.2800e11, -8.7040e10),
                  2.4622e7, 1.0241e26, vector(966.8, 5495.1, -131.6))
 ]
 ```
