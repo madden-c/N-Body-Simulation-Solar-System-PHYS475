@@ -15,10 +15,10 @@ import astropy.units as u      # For unit handling in astronomy
 Next, we define our physical constants and our simulation parameters. We define the gravitational constant (G), and we also include a radius_scale_factor to be optionally used to increase planetary bodies' visualized radius without altering the radii used for computations. We define our time step (dt), which will determine how often our simulation makes its calculations for position and velocity. The smaller we make dt, the more accurate our approximations should be. However, if we want to visualize multiple complete orbits, then we should increase dt, or total_simulation_time could be increased if you have the time to run a longer simulation with smaller time steps. 
 ```python
 G = 6.674e-11                  # Gravitational constant (m^3 kg^-1 s^-2)
-radius_scale_factor = 1e3      # Scaling factor for visualization
+radius_scale_factor = 5e3      # Scaling factor for visualization
 dt = 1e4                       # Time step (seconds)
-total_simulation_time = dt * 1e4  # Total simulation duration 
-bodies_to_compare = ['sun', 'mercury', 'venus', 'earth', 'mars']  # Bodies to simulate
+total_simulation_time = dt * 9e4  # Total simulation duration (can be increased or decreased for longer or shorter simulations) 
+bodies_to_compare = ['sun', 'mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']  # Simulated Bodies
 ```
 Now we create the CelestialBody class. This is a fundamental component of the code that allows us to store the physical properties of the planets needed for the simulation. Once we establish the CelestialBody class, we have defined the structure of each body we look to simulate, now we provide the initial data for each object that will be used to perform the N-Body simulation. We define what visualization characteristics each body will have, and then use VPython vectors to hold initial position and velocity of each planetary body. Our data values for initial position and velocity are pulled from AstroPy JPL Ephemeris via the get_body_barycentric_posvel prompt. The position and velocity that are retrieved are in cartesian representation and are in AU and AU/day respectively. 
 ```python
